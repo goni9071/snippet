@@ -50,7 +50,7 @@ public class PrettyLog implements Serializable {
     stepLog.setKeyContains(keyContains);
     logStack.push(stepLog);
     append(null, (stepLog.getDepth() > 1 ? " " : "") + "+---------------------------------------------------");
-    append("START", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(Calendar.getInstance(Locale.KOREA)));
+    append("START", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(Calendar.getInstance(Locale.KOREA).getTime()));
     append("ID", id);
   }
 
