@@ -16,4 +16,11 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.test.skip>true</maven.test.skip>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch</artifactId>
+      <version>0.1.55</version>
+    </dependency>
+  </dependencies>
 </project>
