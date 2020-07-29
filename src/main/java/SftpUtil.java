@@ -41,12 +41,11 @@ public class SftpUtil {
     return connection;
   }
 
-  // 단일 파일 업로드
   public static boolean upload(String url, String user, String password, String remoteDir, File uploadFile) {
     Map<String, Object> connection = connect(url, user, password);
     ChannelSftp channelSftp = (ChannelSftp) connection.get("channelSftp");
     FileInputStream in = null;
-    try { // 파일을 가져와서 inputStream에 넣고 저장경로를 찾아 put
+    try {
       in = new FileInputStream(uploadFile);
       channelSftp.cd(remoteDir);
       channelSftp.put(in, uploadFile.getName());
