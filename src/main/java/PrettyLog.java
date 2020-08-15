@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
-//import java.util.logging.Logger;
 
 public class PrettyLog implements Serializable {
   private static final ThreadLocal<PrettyLog> threadLocal = new ThreadLocal<>();
@@ -32,6 +31,7 @@ public class PrettyLog implements Serializable {
   private Stack<StepLog> logStack = new Stack<StepLog>();
   private List<Message> messageList = new ArrayList<Message>();
   long elapsed;
+  private boolean ignore;
 
   public PrettyLog(String id) {
     start(id);
@@ -42,6 +42,8 @@ public class PrettyLog implements Serializable {
   }
 
   public void start(String id, String keyContains) {
+    if (ignore)
+      return;
     StepLog stepLog = new StepLog();
     stepLog.setId(id);
     stepLog.setStopWatch(System.currentTimeMillis());
@@ -62,15 +64,19 @@ public class PrettyLog implements Serializable {
   }
 
   /**
-   * PrettyLog ÇÑ ÁÙ·Î Ç¥½Ã
+   * PrettyLog í•œì¤„ë¡œ ì¶œë ¥.
    */
   public void setViewOneLine() {
+    if (ignore)
+      return;
     if (logStack.isEmpty() == false) {
       logStack.peek().setViewOneLine(true);
     }
   }
 
   public void append(String key, Object value) {
+    if (ignore)
+      return;
     StepLog stepLog = logStack.isEmpty() ? null : logStack.peek();
     if (value instanceof String) {
       String response = (String) value;
@@ -86,6 +92,8 @@ public class PrettyLog implements Serializable {
   }
 
   public void stop() {
+    if (ignore)
+      return;
     if (logStack.isEmpty() == false) {
       StepLog stepLog = logStack.peek();
       elapsed = System.currentTimeMillis() - stepLog.getStopWatch();
@@ -97,10 +105,14 @@ public class PrettyLog implements Serializable {
   }
 
   public long getElapsed() {
+    if (ignore)
+      return 0;
     return elapsed;
   }
 
   public String prettyPrint() {
+    if (ignore)
+      return null;
     StringBuilder rootLog = new StringBuilder("\n");
     Message preMessage = null;
     for (Message message : messageList) {
@@ -146,6 +158,8 @@ public class PrettyLog implements Serializable {
   }
 
   private void prefix(StringBuilder rootLog, int depth) {
+    if (ignore)
+      return;
     for (int i = 0; i < depth; i++) {
       if (depth > 1 && i > 0) {
         rootLog.append(" " + PREFIX);
@@ -250,5 +264,9 @@ public class PrettyLog implements Serializable {
     public void setShow(Boolean isShow) {
       this.isShow = isShow;
     }
+  }
+
+  public void ignore(boolean ignore) {
+    this.ignore = ignore;
   }
 }
