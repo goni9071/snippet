@@ -5,6 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.RemoteAddCommand;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.URIish;
@@ -32,10 +33,9 @@ public class JgitUtil {
   private static String hash = "origin/master";
   private static String url = "https://github.com/xxx.git";
   private static CredentialsProvider cp = new UsernamePasswordCredentialsProvider(userId, userPass);
-  private static File localRepo = new File("d:\\test\\tmp");
 
-  public static Git init() throws Exception {
-    return Git.init().setDirectory(localRepo).call();
+  public static Git init(File dir) throws Exception {
+    return Git.init().setDirectory(dir).call();
   }
 
   public static void remoteAdd(Git git) throws Exception {
@@ -84,16 +84,26 @@ public class JgitUtil {
     }
   }
 
-  public static void checkOut() throws Exception {
+  public static void checkOut(File dir) throws Exception {
     Git gitRepo = Git.cloneRepository().setURI(url) // remote 주소
-        .setDirectory(localRepo) // 다운받을 로컬의 위치
+        .setDirectory(dir) // 다운받을 로컬의 위치
         .setNoCheckout(true)//
         .setCredentialsProvider(cp) // 인증 정보
         .call();
     gitRepo.checkout().setStartPoint(hash) // origin/branch_name
-        //.addPath("not thing") // 다운받을 대상 경로
+        // .addPath("not thing") // 다운받을 대상 경로
         .call();
 
     gitRepo.getRepository().close();
+  }
+
+  public static Git open(File dir) throws Exception {
+    Git git = null;
+    try {
+      git = Git.open(dir);
+    } catch (RepositoryNotFoundException e) {
+      git = JgitUtil.init(dir);
+    }
+    return git;
   }
 }
