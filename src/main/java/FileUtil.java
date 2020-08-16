@@ -1,10 +1,12 @@
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -860,5 +862,46 @@ public class FileUtil {
     }
 
     return jar;
+  }
+
+  public static File write(String contents, String targetFile) {
+    return write(new ByteArrayInputStream(contents.getBytes()), targetFile);
+  }
+
+  public static File write(InputStream in, String targetFile) {
+    OutputStream out = null;
+    File tFile = null;
+    try {
+      tFile = new File(targetFile);
+      out = new FileOutputStream(tFile);
+      int read = 0;
+      byte[] buf = new byte[BUFFER_SIZE];
+      while ((read = in.read(buf)) != -1)
+        out.write(buf, 0, read);
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException("파일을 찾을 수 없습니다.", e);
+    } catch (IOException e) {
+      throw new RuntimeException("파일을 쓰는 중에 오류가 발생하였습니다.", e);
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      if (in != null) {
+        try {
+          in.close();
+        } catch (IOException e) {
+          throw new RuntimeException("파일을 쓰는 중에 오류가 발생하였습니다.", e);
+        }
+      }
+      if (out != null) {
+        try {
+          out.flush();
+          out.close();
+        } catch (IOException e) {
+          throw new RuntimeException("파일을 쓰는 중에 오류가 발생하였습니다.", e);
+        }
+      }
+    }
+
+    return tFile;
   }
 }
