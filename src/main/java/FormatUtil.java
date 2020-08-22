@@ -20,12 +20,21 @@ public class FormatUtil {
     try {
       String strVal = String.valueOf(obj);
       int pointIndex = strVal.indexOf(".");
-      Long val = Long.parseLong(pointIndex < 0 ? strVal : strVal.substring(0, pointIndex));
+      Long val = null;
+      if (pointIndex < 0) { // 소수점 없음
+        val = Long.parseLong(strVal);
+      } else { // 소수점 있다면
+        val = Long.parseLong(strVal.substring(0, pointIndex));
+      }
+
       String result = String.format("%,d", val);
       if (pointIndex > 0) {
         String decimal = strVal.substring(pointIndex);
         if (!decimal.matches(".0+")) {
           result += decimal;
+          if (val == 0 && String.valueOf(obj).startsWith("-")) {
+            result = "-" + result;
+          }
         }
       }
       return result;
